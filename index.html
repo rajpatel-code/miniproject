@@ -1,0 +1,58 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin Price Predictor</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 500px; margin: 50px auto; text-align: center; }
+        input { padding: 10px; width: 100%; margin: 10px 0; }
+        button { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+        .result { margin-top: 20px; font-size: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bitcoin Price Predictor</h1>
+        <form id="predictForm">
+            <input type="number" id="open_close" name="open_close" placeholder="Open-Close Difference" required><br>
+            <input type="number" id="low_high" name="low_high" placeholder="Low-High Difference" required><br>
+            <input type="number" id="is_quarter_end" name="is_quarter_end" placeholder="Is Quarter End (1/0)" required><br>
+            <button type="submit">Predict</button>
+        </form>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('predictForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let open_close = document.getElementById('open_close').value;
+            let low_high = document.getElementById('low_high').value;
+            let is_quarter_end = document.getElementById('is_quarter_end').value;
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    open_close: open_close,
+                    low_high: low_high,
+                    is_quarter_end: is_quarter_end
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').innerHTML = 
+                    'Prediction: ' + (data.prediction === 1 ? 'Price will increase' : 'Price will decrease');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
